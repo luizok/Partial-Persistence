@@ -5,9 +5,9 @@
 #include "utils.h"
 
 
-int main() {
+int _main() {
 
-    printf("oi\n");
+    LLNode_t* root = new_node(1);
 
     return 0;
 }

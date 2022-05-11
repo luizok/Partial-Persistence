@@ -6,7 +6,11 @@
 
 LLNode_t* new_node(int value) {
 
-    return NULL;
+    LLNode_t* node = (LLNode_t*) malloc(sizeof(LLNode_t));
+    node->value = value;
+    node->next = NULL;
+
+    return node;
 }
 
 
