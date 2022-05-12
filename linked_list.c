@@ -33,7 +33,26 @@ BOOL insert_node(LLNode_t** root, int value) {
 
 BOOL remove_node(LLNode_t** root, int value) {
 
-    return TRUE;
+    if(!(*root))
+        return FALSE;
+
+    LLNode_t* prev_node = NULL;
+    LLNode_t* curr_node = *root;
+    while(curr_node) {
+        if(curr_node->value == value) {
+            if(prev_node)
+                prev_node->next = curr_node->next;
+            else
+                *root = curr_node->next;
+
+            return TRUE;
+        }
+
+        prev_node = curr_node;
+        curr_node = curr_node->next;
+    }
+
+    return FALSE;
 }
 
 int search_node(LLNode_t** root, int value) {
