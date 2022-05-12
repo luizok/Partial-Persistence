@@ -14,22 +14,34 @@ LLNode_t* new_node(int value) {
 }
 
 
-BOOL insert_node(LLNode_t* root, int value) {
+BOOL insert_node(LLNode_t** root, int value) {
 
-    return FALSE;
-}
-
-BOOL remove_node(LLNode_t* root, int value) {
+    LLNode_t* new = new_node(value);
+    if(!(*root)) {
+        *root = new;
+        return TRUE;
+    }
+    
+    LLNode_t* curr_node = *root;
+    while(curr_node->next)
+        curr_node = curr_node->next;    
+    
+    curr_node->next = new;
 
     return TRUE;
 }
 
-int search_node(LLNode_t* root, int value) {
+BOOL remove_node(LLNode_t** root, int value) {
+
+    return TRUE;
+}
+
+int search_node(LLNode_t** root, int value) {
 
     return -1;
 }
 
-int successor_node(LLNode_t* root, int value) {
+int successor_node(LLNode_t** root, int value) {
 
     return -1;
 }
