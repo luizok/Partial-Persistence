@@ -43,10 +43,15 @@ BOOL remove_node(LLNode_t** root, int value) {
     LLNode_t* curr_node = *root;
     while(curr_node) {
         if(curr_node->value == value) {
-            if(prev_node)
+            if(prev_node) {
                 prev_node->next = curr_node->next;
-            else
+                if(curr_node->next)
+                    curr_node->next->backref_next = prev_node;
+            } else {
                 *root = curr_node->next;
+                if(*root)
+                    (*root)->backref_next = NULL;
+            }
 
             return TRUE;
         }
