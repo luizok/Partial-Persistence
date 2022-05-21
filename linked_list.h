@@ -7,6 +7,8 @@
 typedef struct LLNode {
     int value;
     struct LLNode* next;
+    struct LLNode* backref_next;
+    ChangeLog_t mods[2];
 } LLNode_t;
 
 
