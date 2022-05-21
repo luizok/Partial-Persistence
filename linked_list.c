@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "linked_list.h"
+#include "version_ctrl.h"
 #include "utils.h"
 
 
@@ -9,6 +11,7 @@ LLNode_t* new_node(int value) {
     LLNode_t* node = (LLNode_t*) malloc(sizeof(LLNode_t));
     node->value = value;
     node->next = NULL;
+    node->backref_next = NULL;
 
     return node;
 }
@@ -20,6 +23,7 @@ BOOL insert_node(LLNode_t** root, int value) {
 
     if(!(*root)) {
         *root = new;
+        update_version(*root);
         return TRUE;
     }
     
@@ -29,15 +33,18 @@ BOOL insert_node(LLNode_t** root, int value) {
 
     new->backref_next = curr_node;
     curr_node->next = new;
-    curr_node->next = new;
+
+    update_version(*root);
 
     return TRUE;
 }
 
 BOOL remove_node(LLNode_t** root, int value) {
 
-    if(!(*root))
+    if(!(*root)) {
+        update_version(*root);
         return FALSE;
+    }
 
     LLNode_t* prev_node = NULL;
     LLNode_t* curr_node = *root;
@@ -53,6 +60,7 @@ BOOL remove_node(LLNode_t** root, int value) {
                     (*root)->backref_next = NULL;
             }
 
+            update_version(*root);
             return TRUE;
         }
 
@@ -60,6 +68,7 @@ BOOL remove_node(LLNode_t** root, int value) {
         curr_node = curr_node->next;
     }
 
+    update_version(*root);
     return FALSE;
 }
 
