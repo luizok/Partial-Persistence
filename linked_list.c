@@ -72,3 +72,16 @@ int successor_node(LLNode_t** root, int value) {
 
     return -1;
 }
+
+void print_as_list(LLNode_t* root) {
+
+    printf("LISTA\n");
+    while(root) {
+        printf(
+            "at: %p, v: %d, backref v: %d\n",
+            root, root->value,
+            root->backref_next ? root->backref_next->value : -1
+        );
+        root = root->next;
+    }
+}
