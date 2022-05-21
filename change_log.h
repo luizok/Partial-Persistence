@@ -5,10 +5,14 @@
 typedef struct ChangeLog {
     int version;
     char field_name[32];
-    int new_value;
+    char* field_value;
+    int field_size; 
 } ChangeLog_t;
 
 
-ChangeLog_t* new_change_log(int version, char* field_name, int new_value);
+ChangeLog_t* new_change_log(int version,
+                            char* field_name,
+                            char* field_addr,
+                            int field_size);
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include "change_log.h"
 #include "utils.h"
 
 

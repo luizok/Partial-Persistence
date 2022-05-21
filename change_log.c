@@ -1,17 +1,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "linked_list.h"
+#include "change_log.h"
 #include "utils.h"
 
 
-ChangeLog_t* new_change_log(int version, char* field_name, int new_value) {
+ChangeLog_t* new_change_log(int version,
+                            char* field_name,
+                            char* field_addr,
+                            int field_size) {
 
     ChangeLog_t* change_log = (ChangeLog_t*) malloc(sizeof(ChangeLog_t));
     change_log->version = version;
-    change_log->new_value = new_value;
-
     strncpy(change_log->field_name, field_name, 32);
+
+    change_log->field_value = (char*) malloc(field_size);
+    strncpy(change_log->field_value, field_addr, field_size);
+    change_log->field_size = field_size;
 
     return change_log;
 }
