@@ -50,11 +50,19 @@ void log_change(LLNode_t** node,
         return;
     }
 
+    printf("BIXOU\n");
     LLNode_t* new = new_node((*node)->value);
     new->next = (LLNode_t*) (*node)->mods[1]->field_value;
+    new->backref_next = (*node)->backref_next;
 
-    if((*node)->backref_next)
-        log_change(&(*node)->backref_next,
+    log_change(&new,
+               version,
+               field_name,
+               (char*) &(new->next),
+               sizeof(LLNode_t*));
+
+    if(new->backref_next)
+        log_change(&(new->backref_next),
                    version,
                    field_name,
                    (char*) &new,
@@ -87,11 +95,26 @@ BOOL insert_node(LLNode_t** root, int value) {
     }
     
     LLNode_t* curr_node = *root;
-    while(get_node_next_field_latest(curr_node))
+    LLNode_t* latest_next_node = get_node_next_field_latest(curr_node);
+    while(latest_next_node && (latest_next_node->value < value)) {
         curr_node = get_node_next_field_latest(curr_node);
+        latest_next_node = get_node_next_field_latest(curr_node);
+    }
+
+    printf("new: %p\n", new);
+    printf("curr: %p\n", curr_node);
+    printf("next: %p\n", latest_next_node);
+    printf("\n");
 
     new->backref_next = curr_node;
-    // curr_node->next = new;
+    if(latest_next_node)
+        latest_next_node->backref_next = new;
+
+    log_change(&new,
+               curr_version,
+               "next",
+               (char*) &latest_next_node,
+               sizeof(LLNode_t*));
 
     log_change(&curr_node,
                curr_version,
@@ -149,7 +172,7 @@ int search_node(LLNode_t** root, int value) {
 
 int successor_node(int value, int version) {
 
-    int v = version > curr_version ? curr_version-1 : version; 
+    int v = version >= curr_version ? curr_version-1 : version; 
     LLNode_t* root = versions[v];
     LLNode_t* prev = NULL;
     while(root) {
@@ -164,9 +187,9 @@ int successor_node(int value, int version) {
 
 void print_as_list_at_version(int version) {
 
-    int v = version > curr_version ? curr_version-1 : version;
-    // print_as_list_debug(versions[v], v);
-    print_as_list(versions[v], v);
+    int v = version >= curr_version ? curr_version-1 : version;
+    print_as_list_debug(versions[v], v);
+    // print_as_list(versions[v], v);
 }
 
 void print_as_list(LLNode_t* root, int version) {
