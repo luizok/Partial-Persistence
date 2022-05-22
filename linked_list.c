@@ -149,7 +149,7 @@ int search_node(LLNode_t** root, int value) {
 
 int successor_node(int value, int version) {
 
-    int v = version > curr_version ? curr_version-1 : version; 
+    int v = version >= curr_version ? curr_version-1 : version; 
     LLNode_t* root = versions[v];
     LLNode_t* prev = NULL;
     while(root) {
@@ -164,7 +164,7 @@ int successor_node(int value, int version) {
 
 void print_as_list_at_version(int version) {
 
-    int v = version > curr_version ? curr_version-1 : version;
+    int v = version >= curr_version ? curr_version-1 : version;
     // print_as_list_debug(versions[v], v);
     print_as_list(versions[v], v);
 }
