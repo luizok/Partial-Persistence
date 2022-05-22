@@ -21,6 +21,6 @@ BOOL insert_node(LLNode_t** root, int value);
 BOOL remove_node(LLNode_t** root, int value);
 int search_node(LLNode_t** root, int value);
 int successor_node(LLNode_t** root, int value);
-void print_as_list(LLNode_t* root);
+void print_as_list_at_version(int version);
 
 #endif

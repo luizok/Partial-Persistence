@@ -6,8 +6,32 @@
 #include "utils.h"
 
 
+extern LLNode_t** versions;
 extern int curr_version;
 
+
+LLNode_t* get_node_next_field_at_version(LLNode_t* node, int version) {
+
+    ChangeLog_t* last_cl = NULL;
+    for(int i=0; i < MODS_SIZE; i++)
+        if(node->mods[i])
+            if(node->mods[i]->version <= version) {
+                last_cl = node->mods[i];
+            }
+
+    if(last_cl)     
+        return (LLNode_t*) last_cl->field_value;
+
+    return NULL;
+}
+
+LLNode_t* get_node_next_field_latest(LLNode_t* node) {
+
+    if(!node)
+        return NULL;
+
+    return get_node_next_field_at_version(node, curr_version-1);
+}
 
 void log_change(LLNode_t* node,
                 int version,
@@ -36,6 +60,9 @@ LLNode_t* new_node(int value) {
     node->backref_next = NULL;
     node->curr_mod = 0;
 
+    for(int i=0; i < MODS_SIZE; i++)
+        node->mods[i] = NULL;
+
     return node;
 }
 
@@ -50,14 +77,15 @@ BOOL insert_node(LLNode_t** root, int value) {
     }
     
     LLNode_t* curr_node = *root;
-    while(curr_node->next)
-        curr_node = curr_node->next;
+    while(get_node_next_field_latest(curr_node))
+        curr_node = get_node_next_field_latest(curr_node);
 
     new->backref_next = curr_node;
-    curr_node->next = new;
+    // curr_node->next = new;
 
+    // printf("NEW: %p\n", &new);
     log_change(curr_node,
-               curr_version+1,
+               curr_version,
                "next",
                (char*) &new,
                sizeof(LLNode_t*));
@@ -115,7 +143,13 @@ int successor_node(LLNode_t** root, int value) {
     return -1;
 }
 
-void print_as_list(LLNode_t* root) {
+void print_as_list_at_version(int version) {
+
+    int v = version > curr_version ? curr_version-1 : version;
+    print_as_list_debug(versions[v], v);
+}
+
+void print_as_list_debug(LLNode_t* root, int version) {
 
     printf("LISTA\n");
     while(root) {
@@ -126,16 +160,15 @@ void print_as_list(LLNode_t* root) {
         );
         for(int i=0; i < MODS_SIZE; i++) {
             if(root->mods[i]) {
-                printf("(v%d, %s, 0x",
+                printf("(v%d, %s, %p) ",
                         root->mods[i]->version,
-                        root->mods[i]->field_name);
-                for(int k=0; k < root->mods[i]->field_size-1; k++)
-                    printf("%02x",  (BYTE) root->mods[i]->field_value[k]);
-                printf("), ");
+                        root->mods[i]->field_name,
+                        root->mods[i]->field_value);
             }
         }
         printf("\n");
             
-        root = root->next;
+        // root = root->next;
+        root = get_node_next_field_at_version(root, version);
     }
 }
