@@ -33,7 +33,7 @@ int main() {
     printf("\n");
 
     // remove_node(&root, 0);
-    // remove_node(&root, 2);
+    remove_node(&root, 2);
     // remove_node(&root, 3);
     // remove_node(&root, 1);
 
@@ -47,9 +47,9 @@ int main() {
     printf("\n");
     print_as_list_at_version(4);
     printf("\n");
-    print_as_list_at_version(99);
-    // print_as_list_at_version(4);
-    // print_as_list_at_version(5);
+    print_as_list_at_version(8);
+    print_as_list_at_version(9);
+    print_as_list_at_version(5);
     printf("\n");
 
 

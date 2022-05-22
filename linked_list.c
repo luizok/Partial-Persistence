@@ -104,19 +104,21 @@ BOOL remove_node(LLNode_t** root, int value) {
 
     LLNode_t* prev_node = NULL;
     LLNode_t* curr_node = *root;
+    LLNode_t* next_latest_node = NULL;
     while(curr_node) {
         if(curr_node->value == value) {
             if(prev_node) {
                 // prev_node->next = curr_node->next;
+                next_latest_node = get_node_next_field_latest(curr_node);
                 log_change(prev_node,
-                           curr_version+1,
+                           curr_version,
                            "next",
-                           (char*) &curr_node->next,
+                           (char*) &next_latest_node,
                            sizeof(LLNode_t*));
                 if(curr_node->next)
                     curr_node->next->backref_next = prev_node;
             } else {
-                *root = curr_node->next;
+                *root = get_node_next_field_latest(curr_node);
                 if(*root)
                     (*root)->backref_next = NULL;
             }
@@ -126,7 +128,7 @@ BOOL remove_node(LLNode_t** root, int value) {
         }
 
         prev_node = curr_node;
-        curr_node = curr_node->next;
+        curr_node = get_node_next_field_latest(curr_node);
     }
 
     update_version(*root);
@@ -151,7 +153,7 @@ void print_as_list_at_version(int version) {
 
 void print_as_list_debug(LLNode_t* root, int version) {
 
-    printf("LISTA\n");
+    printf("LISTA V%d\n", version);
     while(root) {
         printf(
             "at: %p, v: %d, backref v: %d, mods: ",
