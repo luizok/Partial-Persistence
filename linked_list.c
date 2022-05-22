@@ -155,7 +155,18 @@ int successor_node(LLNode_t** root, int value) {
 void print_as_list_at_version(int version) {
 
     int v = version > curr_version ? curr_version-1 : version;
-    print_as_list_debug(versions[v], v);
+    // print_as_list_debug(versions[v], v);
+    print_as_list(versions[v], v);
+}
+
+void print_as_list(LLNode_t* root, int version) {
+    
+    printf("V%d: ", version);
+    while(root) {
+        printf("%d ", root->value);
+        root = get_node_next_field_at_version(root, version);
+    }
+    printf("\n");
 }
 
 void print_as_list_debug(LLNode_t* root, int version) {
