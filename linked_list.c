@@ -115,8 +115,8 @@ BOOL remove_node(LLNode_t** root, int value) {
                            "next",
                            (char*) &next_latest_node,
                            sizeof(LLNode_t*));
-                if(curr_node->next)
-                    curr_node->next->backref_next = prev_node;
+                if(next_latest_node)
+                    next_latest_node->backref_next = prev_node;
             } else {
                 *root = get_node_next_field_latest(curr_node);
                 if(*root)
