@@ -22,7 +22,10 @@ void parse_file(char *filename) {
         } else if(strcmp(cmd, "REM") == 0) {
             remove_node(&root, params[0]);
         } else if(strcmp(cmd, "SUC") == 0) {
-            printf("NOT IMPLEMENTED - SUC");
+            printf("SUC(%d V%d) = %d\n",
+                   params[0],
+                   params[1],
+                   successor_node(params[0], params[1]));
         } else if(strcmp(cmd, "IMP") == 0) {
             print_as_list_at_version(params[0]);
         }

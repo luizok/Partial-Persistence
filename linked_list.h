@@ -20,7 +20,7 @@ LLNode_t* new_node(int value);
 BOOL insert_node(LLNode_t** root, int value);
 BOOL remove_node(LLNode_t** root, int value);
 int search_node(LLNode_t** root, int value);
-int successor_node(LLNode_t** root, int value);
+int successor_node(int value, int version);
 void print_as_list_at_version(int version);
 
 #endif

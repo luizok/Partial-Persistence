@@ -147,7 +147,17 @@ int search_node(LLNode_t** root, int value) {
     return -1;
 }
 
-int successor_node(LLNode_t** root, int value) {
+int successor_node(int value, int version) {
+
+    int v = version > curr_version ? curr_version-1 : version; 
+    LLNode_t* root = versions[v];
+    LLNode_t* prev = NULL;
+    while(root) {
+        if(root->value > value)
+            return root->value;
+
+        root = get_node_next_field_at_version(root, version);
+    }
 
     return -1;
 }
