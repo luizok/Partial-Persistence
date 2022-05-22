@@ -1,6 +1,8 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#define MODS_SIZE 2
+
 #include "change_log.h"
 #include "utils.h"
 
@@ -9,7 +11,8 @@ typedef struct LLNode {
     int value;
     struct LLNode* next;
     struct LLNode* backref_next;
-    ChangeLog_t mods[2];
+    ChangeLog_t* mods[MODS_SIZE];
+    int curr_mod;
 } LLNode_t;
 
 

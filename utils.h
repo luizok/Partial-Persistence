@@ -5,5 +5,6 @@
 #define BOOL int
 #define FALSE 0
 #define TRUE 1
+#define BYTE unsigned char
 
 #endif
