@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "linked_list.h"
 #include "version_ctrl.h"
@@ -33,7 +34,7 @@ LLNode_t* get_node_next_field_latest(LLNode_t* node) {
     return get_node_next_field_at_version(node, curr_version-1);
 }
 
-void log_change(LLNode_t* node,
+void log_change(LLNode_t** node,
                 int version,
                 char* field_name,
                 char* field_addr,
@@ -42,13 +43,49 @@ void log_change(LLNode_t* node,
                                      field_name,
                                      field_addr,
                                      field_size);
-    if(node->curr_mod < 2) {
-        node->mods[node->curr_mod] = cl;
-        node->curr_mod++;
+
+    // printf("MODS: %d\n", (*node)->curr_mod);
+    if((*node)->curr_mod < 2) {
+        (*node)->mods[(*node)->curr_mod] = cl;
+        (*node)->curr_mod++;
         return;
     }
 
-    // Create new node and update
+    // printf("NODE: %p\n", *node);
+    // printf("NODE VALUE: %d\n", (*node)->value);
+    // printf("NODE NEXT: %p\n", (*node)->next);
+    // printf("NODE BACKNEXT: %p\n", (*node)->backref_next);
+
+    // printf("BIXOU\n");
+
+    LLNode_t* new = new_node((*node)->value);
+    new->next = (LLNode_t*) (*node)->mods[1]->field_value;
+
+    // (*node)->backref_next->next = new;
+    // *node = new;
+    // printf("NODE: %p\n", *node);
+    // printf("P: %p\n", &((*node)->backref_next));
+    if((*node)->backref_next)
+        log_change(&(*node)->backref_next,
+                   version,
+                   field_name,
+                   (char*) &new,
+                   sizeof(LLNode_t*));
+    // log_change(node,
+    //            version,
+    //            field_name,
+    //            field_addr,
+    //            sizeof(LLNode_t*));
+
+    // if(new->backref_next) {
+    //     // new->backref_next->next = new;
+    // }
+
+    // printf("NEW %p\n", new);
+    // printf("NEW VALUE: %d\n", new->value);
+    // printf("NEW NEXT: %p\n", new->next);
+    // printf("NEW BACKNEXT: %p\n", new->next->backref_next);
+    // // Create new node and update
 }
 
 
@@ -84,7 +121,7 @@ BOOL insert_node(LLNode_t** root, int value) {
     // curr_node->next = new;
 
     // printf("NEW: %p\n", &new);
-    log_change(curr_node,
+    log_change(&curr_node,
                curr_version,
                "next",
                (char*) &new,
@@ -110,13 +147,14 @@ BOOL remove_node(LLNode_t** root, int value) {
             if(prev_node) {
                 // prev_node->next = curr_node->next;
                 next_latest_node = get_node_next_field_latest(curr_node);
-                log_change(prev_node,
+                log_change(prev_node == *root ? root : &prev_node,
                            curr_version,
                            "next",
                            (char*) &next_latest_node,
                            sizeof(LLNode_t*));
-                if(next_latest_node)
-                    next_latest_node->backref_next = prev_node;
+                // if(next_latest_node)
+                //     next_latest_node->backref_next = prev_node;
+
             } else {
                 *root = get_node_next_field_latest(curr_node);
                 if(*root)
