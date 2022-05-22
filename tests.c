@@ -64,7 +64,7 @@ int test_remove_node_root() {
     printf("\troot->value == 2? %d\n", root->value == 2);
 }
 
-int main() {
+int _main() {
 
     test_new_node();
     test_insert_node_not_root();
