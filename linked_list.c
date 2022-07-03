@@ -23,7 +23,7 @@ LLNode_t* get_node_next_field_at_version(LLNode_t* node, int version) {
     if(last_cl)     
         return (LLNode_t*) last_cl->field_value;
 
-    return NULL;
+    return node->next;
 }
 
 LLNode_t* get_node_next_field_latest(LLNode_t* node) {
@@ -50,15 +50,22 @@ void log_change(LLNode_t** node,
         return;
     }
 
-    LLNode_t* new = new_node((*node)->value);
-    new->next = (LLNode_t*) (*node)->mods[1]->field_value;
+    // printf("CHEIO: %d\n", (*node)->value);
+    // printf("CHEIO: %p\n", *node);
 
-    if((*node)->backref_next)
-        log_change(&(*node)->backref_next,
-                   version,
-                   field_name,
-                   (char*) &new,
-                   sizeof(LLNode_t*));
+    LLNode_t* new = new_node((*node)->value);
+    new->next = *((LLNode_t**) field_addr);
+    new->backref_next = (*node)->backref_next;
+
+    if((*node)->next)
+        (*node)->next->backref_next = new;
+    
+    if(new->backref_next)
+        log_change(&new->backref_next,
+                    curr_version,
+                    "next",
+                    (char*) &new,
+                    sizeof(LLNode_t*));
 }
 
 
@@ -79,28 +86,57 @@ LLNode_t* new_node(int value) {
 BOOL insert_node(LLNode_t** root, int value) {
 
     LLNode_t* new = new_node(value);
-
+    // empty list
     if(!(*root)) {
         *root = new;
         update_version(*root);
         return TRUE;
     }
-    
-    LLNode_t* curr_node = *root;
-    while(get_node_next_field_latest(curr_node))
-        curr_node = get_node_next_field_latest(curr_node);
 
-    new->backref_next = curr_node;
-    // curr_node->next = new;
+    LLNode_t* prev_node = NULL;
+    LLNode_t* next_node = *root;
 
-    log_change(&curr_node,
-               curr_version,
-               "next",
-               (char*) &new,
-               sizeof(LLNode_t*));
+    while(next_node && (next_node->value < new->value)) {
+        prev_node = next_node;
+        next_node = get_node_next_field_latest(next_node);
+    }
 
+    // printf("-----------------------\n");
+    // printf("PREV: %p\n", prev_node);
+    // printf("NEXT: %p\n", next_node);
+
+    // replace root
+    if(!prev_node) {
+        log_change(&new,
+                   curr_version,
+                   "next",
+                   (char*) root,
+                   sizeof(LLNode_t*));
+        (*root)->backref_next = new;
+        *root = new;
+
+        update_version(*root);
+        return TRUE;
+    }
+
+    // is tail
+    new->backref_next = prev_node;
+    log_change(&prev_node,
+                curr_version,
+                "next",
+                (char*) &new,
+                sizeof(LLNode_t*));
+
+    // generic case
+    if(next_node) {
+        next_node->backref_next = new;
+        log_change(&new,
+                    curr_version,
+                    "next",
+                    (char*) &next_node,
+                    sizeof(LLNode_t*));
+    }
     update_version(*root);
-
     return TRUE;
 }
 
@@ -166,7 +202,7 @@ void print_as_list_at_version(int version) {
 
     int v = version >= curr_version ? curr_version-1 : version;
     // print_as_list_debug(versions[v], v);
-    print_as_list(versions[v], v);
+    print_as_list_debug(versions[v], v);
 }
 
 void print_as_list(LLNode_t* root, int version) {
