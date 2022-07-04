@@ -2,6 +2,9 @@
 
 ## Relatório
 
+A implementação da ordenação agora está funcionando devidamente, permitindo a inserção de elementos em uma ordem arbitrária e mantendo
+a ordem crescente na lista.
+
 Não consegui implementar de maneira 100% correta a funcionalidade. Após alguns testes,
 percebi a inserção (até onde testei) está funcionando perfeitamente,porém após algumas
 alterações que fiz acabaram quebrando a função de sucessor, que funciona até um certo
