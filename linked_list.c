@@ -142,6 +142,7 @@ BOOL insert_node(LLNode_t** root, int value) {
 
 BOOL remove_node(LLNode_t** root, int value) {
 
+    // empty list
     if(!(*root)) {
         update_version(*root);
         return FALSE;
@@ -149,33 +150,38 @@ BOOL remove_node(LLNode_t** root, int value) {
 
     LLNode_t* prev_node = NULL;
     LLNode_t* curr_node = *root;
-    LLNode_t* next_latest_node = NULL;
-    while(curr_node) {
-        if(curr_node->value == value) {
-            if(prev_node) {
-                // prev_node->next = curr_node->next;
-                next_latest_node = get_node_next_field_latest(curr_node);
-                log_change(prev_node == *root ? root : &prev_node,
-                           curr_version,
-                           "next",
-                           (char*) &next_latest_node,
-                           sizeof(LLNode_t*));
-            } else {
-                *root = get_node_next_field_latest(curr_node);
-                if(*root)
-                    (*root)->backref_next = NULL;
-            }
+    LLNode_t* next_node = get_node_next_field_latest(curr_node);
 
-            update_version(*root);
-            return TRUE;
-        }
-
+    while(curr_node && (curr_node->value != value)) {
         prev_node = curr_node;
-        curr_node = get_node_next_field_latest(curr_node);
+        curr_node = next_node;
+        next_node = get_node_next_field_latest(curr_node);
     }
 
+    // is root
+    if(!prev_node) {
+        LLNode_t* next_node = get_node_next_field_latest(curr_node);
+        *root = next_node;
+        if(next_node)
+            next_node->backref_next = NULL;
+
+        update_version(*root);
+        return TRUE;
+    }
+
+    // generic case
+
+    log_change(&prev_node,
+                curr_version,
+                "next",
+                (char*) &next_node,
+                sizeof(LLNode_t*));
+
+    if(next_node)
+        next_node->backref_next = prev_node;
+
     update_version(*root);
-    return FALSE;
+    return TRUE;
 }
 
 int search_node(LLNode_t** root, int value) {
@@ -202,7 +208,7 @@ void print_as_list_at_version(int version) {
 
     int v = version >= curr_version ? curr_version-1 : version;
     // print_as_list_debug(versions[v], v);
-    print_as_list_debug(versions[v], v);
+    print_as_list(versions[v], v);
 }
 
 void print_as_list(LLNode_t* root, int version) {
